@@ -3,7 +3,6 @@
 from Book import Book
 import m4a
 import ffmpeg
-from pprint import pprint
 from pathlib import Path
 import argparse
 import os
@@ -11,7 +10,7 @@ import os
 parser = argparse.ArgumentParser(description='Convert mp3 files to a m4b file with chapter support, id3 data, and a thumbnail')
 
 parser.add_argument('-q', '--quality', type=int, choices=[1, 2, 3, 4, 5], help='A value between [1..5], with higher numbers being better output quality.')
-parser.add_argument('path', help='Path to the data')
+parser.add_argument('path', help='Path of the audiobook directory')
 args = parser.parse_args()
 
 class Audiobook:
