@@ -71,19 +71,26 @@ class Audiobook:
 	def generate_chapters(self):
 		chapter_list = list()
 		beg_ch = 0
-		for ch in self.od_book.chapters:
-			if not ch['time-offset']:
-				chapter_list.append((self._tconv(0), ch['title']))
-				beg_ch += 1
-			else:
-				break
 
 		prev_file_wrap = 0
 		next_file_wrap = self._fdur(self.od_book.chapters[0]['od-path'])
 		current_file = self.od_book.chapters[0]['od-path']
 
+		for ch in self.od_book.chapters:
+			if not ch['time-offset'] and ch['od-path'] == current_file:
+				chapter_list.append((self._tconv(0), ch['title']))
+				beg_ch += 1
+			else:
+				break
+
 		for ch in self.od_book.chapters[beg_ch:]:
-			if not ch['time-offset']:
+			if not ch['title']:
+				if ch['od-path'] != current_file:
+					prev_file_wrap = next_file_wrap
+					next_file_wrap += self._fdur(ch['od-path'])
+					current_file = ch['od-path']
+				continue
+			elif not ch['time-offset']:
 				t = next_file_wrap
 				prev_file_wrap = next_file_wrap
 				next_file_wrap += self._fdur(ch['od-path'])
@@ -93,8 +100,6 @@ class Audiobook:
 				t = ch['time-offset'] + prev_file_wrap
 			else:
 				t = ch['time-offset'] + prev_file_wrap
-			# prev_file_wrap += 0.09
-			# next_file_wrap += 0.09
 			current_file = ch['od-path']
 			chapter_list.append((self._tconv(t), ch['title']))
 
@@ -121,4 +126,3 @@ aud = Audiobook(args.path)
 aud.convert(args.quality)
 aud.decorate()
 aud.rename()
-

@@ -75,7 +75,19 @@ class Book:
 				ch['time-offset'] = int(info[1])
 			else:
 				ch['time-offset'] = None
+
 			chapters.append(ch)
+
+			if 'contents' in chapter:
+				for cont_ch in chapter['contents']:
+					if 'path' in cont_ch:
+						od_path = cont_ch['path'].split('#')[0]
+						chapters.append({
+							'title': None,
+							'od-path': od_path,
+							'filename': self._get_file_name_with_odpath(od_path),
+							'time-offset': None
+						})
 		return chapters
 
 	# returns the name of an mp3 file, given its size
@@ -121,7 +133,7 @@ class BookData:
 	description = property(_get_description, None, None, None)
 	# string, ISO 2 Letter Language Code
 	language = property(_get_language, None, None, None)
-	# array of dicts, each dict containing 'title' and 'path' keys
+	# array of dicts, each dict containing 'title' and 'path' (and occasionally 'contents') keys
 	chapters = property(_get_chapters, None, None, None)
 	"""
 	array of dicts, each dict containing:
