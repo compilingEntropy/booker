@@ -72,7 +72,7 @@ class Book:
 				ch['od-path'] = None
 				ch['filename'] = None
 			if len(info) > 1:
-				ch['time-offset'] = int(info[1])
+				ch['time-offset'] = float(info[1])
 			else:
 				ch['time-offset'] = None
 
