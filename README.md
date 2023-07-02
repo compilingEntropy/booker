@@ -18,3 +18,11 @@ Requirements:
 - ffmpeg compiled with libfdk_aac encoder support
 - libmp4v2 utils
 
+## bonus scripts
+Over the years I've developed some helper scripts for this workflow, and I'm releasing them here in the hopes they will be helpful to you.
+
+### add_noise.sh
+Adds a low, quiet pure-frequency sine wave to the audiobook. Fixes the problem where your playback device cuts out after the narrator pauses or after a quiet moment. Audible doesn't even fix this! See more details (including usage) at the top of the script.
+
+### send_files.sh
+If you run booker on a remote server instead of locally, this script may help. You can use it to send the files from your device to a different device for processing.

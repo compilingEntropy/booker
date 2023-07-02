@@ -2,6 +2,7 @@
 
 import json
 import os
+import urllib.request
 
 class Book:
 	"""This is a book object"""
@@ -11,7 +12,7 @@ class Book:
 		self.book_data = BookData(path)
 		self._files = self._init_files()
 		self._chapters = self._init_chapters()
-		self._cover = self._find_cover()
+		self._cover = self._get_cover()
 
 	## Properties
 	def _get_files(self):
@@ -53,12 +54,14 @@ class Book:
 			})
 		return files
 
+	# convert od-path to path on disk
 	def _get_file_name_with_odpath(self, odpath):
 		for file in self._files:
 			if file['od-path'] == odpath:
 				return file['filename']
 		return None
 
+	# parse chapter data and generate chapters
 	def _init_chapters(self):
 		chapters = list()
 		for chapter in self.book_data.chapters:
@@ -90,7 +93,35 @@ class Book:
 						})
 		return chapters
 
-	# returns the name of an mp3 file, given its size
+	# get the cover image, one way or another
+	def _get_cover(self):
+		cover_image = self._download_cover()
+		if cover_image is None:
+			cover_image = self._find_cover()
+		print(cover_image)
+		return cover_image
+
+	# download the cover image if it is available
+	def _download_cover(self):
+		file_name = f"{self.book_data.buid}.jpeg"
+		file_path = f"{self.path}{self.book_data.buid}.jpeg"
+		url = f"https://dewey-{self.book_data.buid}.listen.libbyshelf.com{self.book_data.cover_uri}"
+
+		try:
+			with urllib.request.urlopen(url, timeout=10) as response, open(file_path, 'wb') as out_file:
+				data = response.read()
+				headers = response.info()
+				out_file.write(data)
+		except:
+			return None
+
+		if os.path.isfile(file_path):
+			statinfo = os.stat(file_path)
+			if statinfo.st_size >= int(headers['Content-Length']):
+				return file_name
+		return None
+
+	# get the book's cover from disk
 	def _find_cover(self):
 		cover_options = dict()
 		directory = os.fsencode(self.path)
@@ -124,6 +155,10 @@ class BookData:
 		return self.data['nav']['toc']
 	def _get_files(self):
 		return self.data['spine']
+	def _get_buid(self):
+		return self.data['-odread-buid']
+	def _get_cover_uri(self):
+		return self.data['-odread-furbish-uri']
 
 	# dict containing 'main' and 'subtitle' keys
 	title = property(_get_title, None, None, None)
@@ -135,6 +170,10 @@ class BookData:
 	language = property(_get_language, None, None, None)
 	# array of dicts, each dict containing 'title' and 'path' (and occasionally 'contents') keys
 	chapters = property(_get_chapters, None, None, None)
+	# book's unique identifier
+	buid = property(_get_buid, None, None, None)
+	# uri path to cover image
+	cover_uri = property(_get_cover_uri, None, None, None)
 	"""
 	array of dicts, each dict containing:
 		path
