@@ -49,11 +49,9 @@ while read -r size; do
 	done
 done <<< "$( jq -r '.spine[]."-odread-file-bytes"' "$json" )"
 
-# Yeah, take all the jpegs. I don't know how to figure out which one matters.
+# Take all the jpegs newer than 30 days. I don't know how to figure out which one matters.
 # As of the latest update, these will only be used as a backup anyway, since we now try to download the cover.
-for file in ./*.jpeg; do
-	echo "$file" >> /tmp/file_list.txt
-done
+find . -type f -mtime -30 -name '*.jpeg' -print >> /tmp/file_list.txt
 
 # insert your own destination here
 rsync -Phav --files-from=/tmp/file_list.txt ./ home:~/data/audiobooks/"$title"/
