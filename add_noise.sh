@@ -40,8 +40,8 @@
 #      option.
 #
 # usage:
-# ./fix.sh [file.m4b] [options]
-# ./fix.sh ./Oathbringer.m4b -f 2 -v 0.0035 -t
+# ./add_noise.sh [file.m4b] [options]
+# ./add_noise.sh ./Oathbringer.m4b -f 2 -v 0.0035 -t
 #####
 
 if [[ -f "$1" ]]; then

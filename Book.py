@@ -98,7 +98,6 @@ class Book:
 		cover_image = self._download_cover()
 		if cover_image is None:
 			cover_image = self._find_cover()
-		print(cover_image)
 		return cover_image
 
 	# download the cover image if it is available
@@ -117,7 +116,14 @@ class Book:
 
 		if os.path.isfile(file_path):
 			statinfo = os.stat(file_path)
-			if statinfo.st_size >= int(headers['Content-Length']):
+			if 'Content-Length' not in headers or headers['Content-Length'] is None:
+				if statinfo.st_size >= 0:
+					# content-length isn't returned for cache misses, making it hard to verify we got a good file
+					# we just trust urllib to verify the download succeeded in this case
+					return file_name
+				else:
+					return None
+			elif statinfo.st_size >= int(headers['Content-Length']):
 				return file_name
 		return None
 
