@@ -117,7 +117,7 @@ class Book:
 		if os.path.isfile(file_path):
 			statinfo = os.stat(file_path)
 			if 'Content-Length' not in headers or headers['Content-Length'] is None:
-				if statinfo.st_size >= 0:
+				if statinfo.st_size > 0:
 					# content-length isn't returned for cache misses, making it hard to verify we got a good file
 					# we just trust urllib to verify the download succeeded in this case
 					return file_name
