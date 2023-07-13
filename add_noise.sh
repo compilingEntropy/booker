@@ -74,12 +74,12 @@ if [[ -z "$volume" ]]; then
 fi
 
 base="$(basename ${orig} .m4b)"
-runtime="$(ffprobe -i ${orig} -show_entries format=duration -v quiet -sexagesimal -of csv='p=0')"
+runtime="$(ffprobe -i ${orig} -show_entries format=duration -v quiet -of csv='p=0')"
 if (( encode_test == 1 )); then
 	duration='300'
 	fixed="${base}_${frequency}_${volume}_${duration}.m4b"
 else
-	duration="${runtime%%.*}"
+	duration="$((${runtime%%.*}-1))"
 	fixed="${base}_${frequency}_${volume}.m4b"
 fi
 
@@ -103,14 +103,14 @@ ffmpeg -f lavfi -i "sine=frequency=${frequency}:sample_rate=44100[out0];amovie=$
 
 [[ -f ./"$fixed" ]] || exit 1
 
-mp4tags -song "$(exiftool -s3 -title ${orig})" "$fixed"
-mp4tags -artist "$(exiftool -s3 -artist ${orig})" "$fixed"
-mp4tags -album "$(exiftool -s3 -album ${orig})" "$fixed"
-mp4tags -writer "$(exiftool -s3 -composer ${orig})" "$fixed"
-mp4tags -description "$(exiftool -s3 -description ${orig})" "$fixed"
-mp4tags -longdesc "$(exiftool -s3 -longdescription ${orig})" "$fixed"
-mp4tags -type "$(exiftool -s3 -mediatype ${orig})" "$fixed"
-mp4tags -comment "$(exiftool -s3 -comment ${orig})" "$fixed"
+mp4tags -song "$(exiftool -m -s3 -title ${orig})" "$fixed"
+mp4tags -artist "$(exiftool -m -s3 -artist ${orig})" "$fixed"
+mp4tags -album "$(exiftool -m -s3 -album ${orig})" "$fixed"
+mp4tags -writer "$(exiftool -m -s3 -composer ${orig})" "$fixed"
+mp4tags -description "$(exiftool -m -s3 -description ${orig})" "$fixed"
+mp4tags -longdesc "$(exiftool -m -s3 -longdescription ${orig})" "$fixed"
+mp4tags -type "$(exiftool -m -s3 -mediatype ${orig})" "$fixed"
+mp4tags -comment "$(exiftool -m -s3 -comment ${orig})" "$fixed"
 mp4tags -encodedby "freq:${frequency},vol:${volume}" "$fixed"
 # exiftool -ee -tagsFromFile "$orig" -G0:1 "$fixed"
 
